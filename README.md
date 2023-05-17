@@ -6,6 +6,11 @@ This is a simple bash script to manage Docker containers. It allows you to stop 
 
 The script requires Docker to be installed on your system.
 
+## Simple installation
+```
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tulik/dkr/main/install.sh)"
+```
+
 ## Installation
 
 1. Download the `dkr` script.
