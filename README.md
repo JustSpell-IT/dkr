@@ -1,12 +1,13 @@
-# Docker Control (dkr) Script
+# dkr; Docker container manager for MacOS and Ubuntu
 
+## Stop and Remove containers
 This is a simple bash script to manage Docker containers. It allows you to stop and remove all Docker containers with optional force flag.
 
 ## Prerequisites
 
 The script requires Docker to be installed on your system.
 
-## Automatic installation
+## Automatic Installation
 ```
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tulik/dkr/main/install.sh)"
 ```

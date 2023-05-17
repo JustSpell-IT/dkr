@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Control (dkr) Script</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Ubuntu&display=swap');
+
+    .content {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    body {
+      background-color: #1A202C;
+      color: #E5E7EB;
+      font-family: 'Ubuntu', sans-serif;
+    }
+
+    code {
+      color: #deb356;
+      font-size: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .content__header {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-left: 2rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #E5E7EB;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+    
+    .content__title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #E5E7EB;
+    }
+
+    .content__text {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+      color: #A0AEC0;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .content__code {
+      color: #deb356;
+      font-size: 1rem;
+      font-weight: 400;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.5rem;
+      margin-bottom: -1rem;
+      white-space: pre;
+    }
+
+    .content__list {
+      list-style-type: disc;
+      margin-bottom: 1.5rem;
+      padding-left: 2rem;
+    }
+
+    .content__list li {
+      font-size: 1.125rem;
+      line-height: 1.75rem;
+      color: #A0AEC0;
+    }
+
+    .console {
+      position: relative;
+      background-color: #2D3748;
+      border-radius: 0.5rem;
+      padding-top: 1.5rem;
+      padding-bottom: 0rem;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+      height: auto;
+      white-space: pre;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1rem;
+      opacity: 0.9;
+    }
+
+    .console__buttons {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      display: flex;
+    }
+
+    .console__button {
+      width: 0.875rem;
+      height: 0.875rem;
+      margin-right: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .console__button--red {
+      background-color: #F56565;
+    }
+
+    .console__button--yellow {
+      background-color: #ECC94B;
+    }
+
+    .console__button--green {
+      background-color: #48BB78;
+    }
+
+    .console__copy-button {
+      position: absolute;
+      right: 0.75rem;
+      top: 0.75rem;
+      padding: 0.5rem;
+      border: none;
+      background-color: #1A202C;
+      color: #A0AEC0;
+      border-radius: 0.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
+
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .container {
+        max-width: 640px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 1024px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .container {
+        max-width: 1280px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans leading-normal tracking-normal">
+  <header class="bg-gray-800 py-6">
+    <div class="container mx-auto px-4">
+      <h1 class="content__header text-4xl font-bold"><code style="font-size: 5rem !important;">dkr;</code> Docker container manager</h1>
+      <p class="text-xl font-light">A simple way to stop and remove containers on <strong>Ubuntu</strong> and <strong>MacOS</strong></p>
+    </div>
+  </header>
+
+  <main class="content">
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content__title">Introduction</h2>
+        <p class="content__text">This is a simple bash script to manage Docker containers. It allows you to stop and remove all Docker containers with an optional force flag.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content__title">Prerequisites</h2>
+        <p class="content__text">The script requires Docker to be installed on your system. Additionally, the installation script requires curl.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content__title">Installation</h2>
+        <p class="content__text">You can install the dkr</code> script with the following command:</p>
+    <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
+      <div class="console__buttons">
+        <div class="console__button console__button--red"></div>
+        <div class="console__button console__button--yellow"></div>
+        <div class="console__button console__button--green"></div>
+      </div>
+        <button class="console__copy-button" onclick="copyCodeToClipboard()">Copy</button>
+        <pre class="content__code" id="code">
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tulik/dkr/main/install.sh)"
+
+</pre>          
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container mx-auto">
+      <h2 class="content__title">Usage</h2>
+      <p class="content__text"><code>dkr</code> is a simple command-line tool that makes managing Docker containers easy. The general syntax to use <code>dkr</code> is as follows: <code>dkr [action] [--force]</code>.</p> 
+      <p class="content__text"><code>stop</code> When you want to halt all the running Docker containers, this command comes in handy. It pauses all activity but doesn't remove the containers, allowing you to resume work later.</p>
+      <p class="content__text"><code>remove</code> If you need to free up resources and clean up, use this command. It will stop all running Docker containers first, then remove them completely.</p>
+      <p class="content__text">The <code>--force</code>  flag is an optional argument. It ensures the respective action (<code>stop</code> or <code>remove</code>) is carried out forcefully, regardless of the container's current state. It's used like this:
+
+        <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
+          <div class="console__buttons">
+            <div class="console__button console__button--red"></div>
+            <div class="console__button console__button--yellow"></div>
+            <div class="console__button console__button--green"></div>
+          </div>
+            <pre class="content__code">
+$ dkr stop --force
+$ dkr remove --force  
+          </pre>
+        </div>
+      <p class="content__text">After running the installation script, you can use <code>dkr</code> from anywhere on your system. Here's an example of how to use it:</p>
+      <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
+        <div class="console__buttons">
+          <div class="console__button console__button--red"></div>
+          <div class="console__button console__button--yellow"></div>
+          <div class="console__button console__button--green"></div>
+        </div>
+          <pre class="content__code">
+Usage: dkr [action] [--force]
+
+Actions:
+  stop     Stops all Docker containers
+  remove   Stops and removes all Docker containers
+
+Options:
+  --force  Forces the stop or remove process            
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container mx-auto">
+      <h2 class="content__title">Examples</h2>
+      <p class="content__text">The use of dkr becomes clearer with these examples.</p>
+      <p class="content__text">Suppose you want to stop all running Docker containers. You would use the <code>dkr stop</code> command. On execution, each stopped container's ID is displayed as a confirmation.</p>
+      <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
+        <div class="console__buttons">
+          <div class="console__button console__button--red"></div>
+          <div class="console__button console__button--yellow"></div>
+          <div class="console__button console__button--green"></div>
+        </div>
+        <pre class="content__code">
+$ dkr stop      
+
+Stopping and removing all Docker containers...
+7dff5f3dae0a
+9b79cafd596a
+9d66ff06aaca
+ca81899a7a41
+      </pre>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="container mx-auto">
+      <p class="content__text">If you want to stop and then remove all Docker containers, you use the <code>dkr remove</code> command. Similar to the stop command, each container's ID is displayed after it's removed.</p>
+      <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
+        <div class="console__buttons">
+          <div class="console__button console__button--red"></div>
+          <div class="console__button console__button--yellow"></div>
+          <div class="console__button console__button--green"></div>
+        </div>
+        <pre class="content__code">
+$ dkr remove
+
+Stopping and removing all Docker containers...
+7dff5f3dae0a
+9b79cafd596a
+9d66ff06aaca
+ca81899a7a41
+      </pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container mx-auto">
+      <h2 class="content__title">License</h2>
+      <p class="content__text">This project is licensed under the MIT License.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container mx-auto">
+      <h2 class="content__title">
+
+Contributing</h2>
+      <p class="content__text">Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.</p>
+    </div>
+  </section>
+</main>
+<script>
+  function copyCodeToClipboard() {
+    const str = document.getElementById('code').innerText;
+    const el = document.createElement('textarea');
+    el.value = str;
+    el.setAttribute('readonly', '');
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+</script>
+</body>
+</html>
