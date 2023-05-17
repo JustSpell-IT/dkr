@@ -3,8 +3,8 @@
 # Ensure Docker is installed
 if ! command -v docker &> /dev/null
 then
-    echo "Docker could not be found"
-    exit
+    echo "Docker could not be found. Please install it first."
+    exit 1
 fi
 
 # Display help
@@ -12,7 +12,7 @@ display_help() {
     echo "Usage: dkr [action] [--force]"
     echo "Actions:"
     echo "  stop     Stops all Docker containers"
-    echo "  remove   Stops and removes all Docker containers"
+    echo "  remove   Removes all Docker containers"
     echo "Options:"
     echo "  --force  Forces the stop or remove process"
 }
@@ -21,7 +21,7 @@ display_help() {
 if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ -z "$1" ]
 then
     display_help
-    exit
+    exit 0
 fi
 
 ACTION=$1
@@ -36,12 +36,23 @@ fi
 # Perform the requested action
 case $ACTION in
     "stop")
-        echo "Stopping all Docker containers..."
-        docker stop $FORCE $(docker ps -aq)
+        CONTAINERS=$(docker ps -aq)
+        if [ -z "$CONTAINERS" ]; then
+            echo "No Docker containers are currently running."
+        else
+            echo "Stopping all Docker containers..."
+            docker stop $FORCE $CONTAINERS
+        fi
         ;;
     "remove")
-        echo "Stopping and removing all Docker containers..."
-        docker rm $FORCE $(docker ps -aq)
+        CONTAINERS=$(docker ps -aq)
+        if [ -z "$CONTAINERS" ]; then
+            echo "No Docker containers found."
+        else
+            echo "Stopping and removing all Docker containers..."
+            docker stop $CONTAINERS
+            docker rm $FORCE $CONTAINERS
+        fi
         ;;
     *)
         echo "Invalid action. Please provide: stop, remove"
