@@ -6,19 +6,13 @@
   <title>Docker Control (dkr) Script</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Ubuntu&display=swap');
-
-    .content {
-      max-width: 1024px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
 
     body {
       background-color: #1A202C;
       color: #E5E7EB;
       font-family: 'Ubuntu', sans-serif;
-    }
+      
+        }
 
     code {
       color: #deb356;
@@ -26,19 +20,75 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .content__header {
-        font-size: 2rem;
-        font-weight: 600;
-        margin-left: 2rem;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        color: #E5E7EB;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 2rem;
+    footer {
+      padding: 2rem;
+    }
+
+    :root {
+  --grid-width: 30px;
+  --grid-height: 30px;
+  --line-color: #999;
+  --dot-color: #ccc;
+  --dot-size: 2px;
+  --point-gap-width: calc(var(--grid-width) * 4);
+  --point-gap-height: calc(var(--grid-height) * 4);
+}
+
+    .ba-grid {
+      position: relative;
+      z-index: 1;
+      background: radial-gradient(ellipse at bottom left, rgba(104, 128, 138, 0.4) 10%, rgba(138, 114, 76, 0) 40%), linear-gradient(to bottom, rgba(57, 173, 219, 0.25), rgba(42, 60, 87, 0.4)), linear-gradient(135deg, #670d10, #092756);
+    }
+
+    .ba-grid:before {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      mix-blend-mode: overlay;
+      background: linear-gradient(var(--line-color), transparent 1px), linear-gradient(to right, var(--line-color), transparent 1px);
+      background-size: 100% var(--grid-height), var(--grid-width) 100%;
+      pointer-events: none; /* Added */
+    }
+
+    .ba-grid:after{
+      content: '';
+      position: absolute;
+      z-index: 1;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      mix-blend-mode: overlay;
+      background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+      background-size: var(--point-gap-width) var(--point-gap-height);
+      background-position: calc(var(--point-gap-width) / 2) calc(var(--point-gap-height) / 2);
+      pointer-events: none; /* Added */
+    }
+    .content-header {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #E5E7EB;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3rem ;
+      background: rgb(36, 50, 56, 0.8);
     }
     
-    .content__title {
+    .content-dkr {
+      padding: 1rem;
+      font-size: 3rem;
+      font-weight: 600;
+    }
+
+    .content-subheader {
+      font-weight: 200;
+    }
+    
+    .content-title {
       font-size: 2rem;
       font-weight: 600;
       margin-top: 2rem;
@@ -46,7 +96,7 @@
       color: #E5E7EB;
     }
 
-    .content__text {
+    .content-text {
       font-size: 1.25rem;
       line-height: 1.75rem;
       color: #A0AEC0;
@@ -54,82 +104,130 @@
       margin-bottom: 1rem;
     }
 
-    .content__code {
+    .content-code {
       color: #deb356;
       font-size: 1rem;
       font-weight: 400;
       font-family: 'JetBrains Mono', monospace;
       line-height: 1.5rem;
-      margin-top: -0.5rem;
-      margin-bottom: -1rem;
-      white-space: pre;
+      padding: 1.15rem;
+      padding-bottom: 0rem;
     }
 
-    .content__list {
+    .content-list {
       list-style-type: disc;
       margin-bottom: 1.5rem;
       padding-left: 2rem;
     }
 
-    .content__list li {
+    .content-list li {
       font-size: 1.125rem;
       line-height: 1.75rem;
       color: #A0AEC0;
     }
 
-    .console {
-      position: relative;
-      background-color: #2D3748;
-      border-radius: 0.5rem;
-      padding-top: 1.5rem;
-      padding-bottom: 0rem;
-      padding-left: 2.5rem;
-      padding-right: 2.5rem;
-      height: auto;
-      white-space: pre;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.875rem;
-      line-height: 1rem;
-      opacity: 0.9;
-    }
-
-    .console__buttons {
-      position: absolute;
-      top: 0.75rem;
-      left: 0.75rem;
+    .window {
+      overflow: hidden;
       display: flex;
+      flex-direction: column;
+      box-shadow: 0 .8em 1.5em rgba(10, 15, 25, 0.3), 0 .5em 2em rgba(10, 15, 25, 0.);
+      border-radius: .5em;
     }
 
-    .console__button {
-      width: 0.875rem;
-      height: 0.875rem;
-      margin-right: 0.5rem;
+    .window .bar {
+      padding: .5em;
+      flex: 0 0 auto;
+      display: flex;
+      background: linear-gradient(to bottom, #eaeaea, #d2d2d2);
+      border-bottom: 1px solid #7d7d7d;
+      color: #4c4c4c;
+    }
+
+    .window .bar .title {
+      margin: 0;
+      display: inline-block;
+      flex: 1 1 auto;
+      line-height: 1;
+      font-family: 'Helvetica Neue', 'Helvetica', 'Lucida Grande', 'Lucida', 'Arial';
+      text-align: center;
+      margin-left: -4em;
+    }
+
+    .window .bar .buttons {
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    .window .bar .buttons .button {
+      margin: 0 .5em 0 0;
+      height: 1em;
+      width: 1em;
+      display: inline-block;
+      float: left;
       border-radius: 50%;
+      box-shadow: inset 0 0 .1em rgba(51, 51, 51, .4);
     }
 
-    .console__button--red {
-      background-color: #F56565;
+    .window .bar .buttons .button:nth-child(1) {
+      position: relative;
+      background: #fe6058;
     }
 
-    .console__button--yellow {
-      background-color: #ECC94B;
-    }
-
-    .console__button--green {
-      background-color: #48BB78;
-    }
-
-    .console__copy-button {
+    .window .bar .buttons .button:nth-child(1)::after {
+      width: .35em;
+      height: .35em;
+      display: block;
       position: absolute;
-      right: 0.75rem;
-      top: 0.75rem;
-      padding: 0.5rem;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: #4c0000;
+      content: '';
+    }
+
+    .window .bar .buttons .button:nth-child(2) {
+      background: #fdbd34;
+    }
+
+    .window .bar .buttons .button:nth-child(3) {
+      background: #23c944;
+    }
+
+    .window .terminal {
+      padding: .4em;
+      max-height: 400px;
+      overflow-y: auto;
+      flex: 1 1 auto;
+      background: rgb(36, 50, 56, 0.8);
+    }
+
+    .window .terminal p {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      font-family: 'Inconsolata', 'Deja Vu Sans Mono', 'Consolas', 'Monaco', 'Courier';
+      outline: none;
       border: none;
-      background-color: #1A202C;
-      color: #A0AEC0;
-      border-radius: 0.25rem;
-      font-family: 'JetBrains Mono', monospace;
-      cursor: pointer;
+      background: transparent;
+      color: #fdfdfd;
+    }
+
+    .window .terminal p:last-child {
+      position: relative;
+    }
+
+    .window .terminal p:last-child::after {
+      width: .5em;
+      height: 1em;
+      display: block;
+      position: absolute;
+      left: 100%;
+      bottom: 0;
+      background: #929293;
+      content: '';
     }
 
     .container {
@@ -160,164 +258,283 @@
         margin-right: auto;
       }
     }
-  </style>
+</style>
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans leading-normal tracking-normal">
-  <header class="bg-gray-800 py-6">
-    <div class="container mx-auto px-4">
-      <h1 class="content__header text-4xl font-bold"><code style="font-size: 5rem !important;">dkr;</code> Docker container manager</h1>
-      <p class="text-xl font-light">A simple way to stop and remove containers on <strong>Ubuntu</strong> and <strong>MacOS</strong></p>
+  <div class=" ba-grid">
+  <header class="bg-gray-800 py-6 content-header">
+    <div class="container mx-auto px-4 flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl">
+          <code style="font-size: 5rem !important;">dkr;</code> <span class="content-dkr">Docker container manager</span>
+        </h1>
+        <br />
+          <div class="content-subheader">
+            A simple way to stop and remove containers on <strong>Ubuntu</strong> and <strong>MacOS</strong>
+          </div>
+        </div>
+        <div class="flex justify-end items-center space-x-4">
+          <!-- Github -->
+          <a href="https://github.com/soft-cloud-dev">
+            <button
+            type="button"
+            data-te-ripple-init
+            data-te-ripple-color="light"
+            class="mb-2 flex rounded px-6 py-2.5 text-xs font-medium uppercase leading-normal text-black shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg"
+            style="background-color: #d9d9d9">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="currentColor"
+              viewBox="0 0 24 24">
+              <path
+              d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+            &nbsp;&nbsp;Github
+            </button>
+          </a>
+          <!-- Twitter -->
+          <button
+          type="button"
+          data-te-ripple-init
+          data-te-ripple-color="light"
+          class="mb-2 flex rounded px-6 py-2.5 text-xs font-medium uppercase leading-normal text-white shadow-md transition duration-150 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg"
+          style="background-color: #1da1f2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mr-2 h-3.5 w-3.5"
+            fill="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+          </svg>
+          Twitter
+          </button>
+        </div>
+
     </div>
   </header>
 
   <main class="content">
     <section>
       <div class="container mx-auto">
-        <h2 class="content__title">Introduction</h2>
-        <p class="content__text">This is a simple bash script to manage Docker containers. It allows you to stop and remove all Docker containers with an optional force flag.</p>
+        <h2 class="content-title">Introduction</h2>
+        <p class="content-text">This is a simple bash script to manage Docker containers. It allows you to stop and remove all Docker containers with an optional force flag.</p>
       </div>
     </section>
 
     <section>
       <div class="container mx-auto">
-        <h2 class="content__title">Prerequisites</h2>
-        <p class="content__text">The script requires Docker to be installed on your system. Additionally, the installation script requires curl.</p>
+        <h2 class="content-title">Prerequisites</h2>
+        <p class="content-text">The script requires Docker to be installed on your system. Additionally, the installation script requires curl.</p>
       </div>
     </section>
 
     <section>
       <div class="container mx-auto">
-        <h2 class="content__title">Installation</h2>
-        <p class="content__text">You can install the dkr</code> script with the following command:</p>
-    <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
-      <div class="console__buttons">
-        <div class="console__button console__button--red"></div>
-        <div class="console__button console__button--yellow"></div>
-        <div class="console__button console__button--green"></div>
-      </div>
-        <button class="console__copy-button" onclick="copyCodeToClipboard()">Copy</button>
-        <pre class="content__code" id="code">
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tulik/dkr/main/install.sh)"
-
-</pre>          
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="container mx-auto">
-      <h2 class="content__title">Usage</h2>
-      <p class="content__text"><code>dkr</code> is a simple command-line tool that makes managing Docker containers easy. The general syntax to use <code>dkr</code> is as follows: <code>dkr [action] [--force]</code>.</p> 
-      <p class="content__text"><code>stop</code> When you want to halt all the running Docker containers, this command comes in handy. It pauses all activity but doesn't remove the containers, allowing you to resume work later.</p>
-      <p class="content__text"><code>remove</code> If you need to free up resources and clean up, use this command. It will stop all running Docker containers first, then remove them completely.</p>
-      <p class="content__text">The <code>--force</code>  flag is an optional argument. It ensures the respective action (<code>stop</code> or <code>remove</code>) is carried out forcefully, regardless of the container's current state. It's used like this:
-
-        <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
-          <div class="console__buttons">
-            <div class="console__button console__button--red"></div>
-            <div class="console__button console__button--yellow"></div>
-            <div class="console__button console__button--green"></div>
+        <h2 class="content-title">Installation</h2>
+        <p class="content-text">You can install the dkr</code> script with the following command:</p>
+        <div class="window">
+          <div class="bar">
+            <div class="buttons">
+              <div class="button"></div>
+              <div class="button"></div>
+              <div class="button"></div>
+            </div>
+            <div class="title">Installation</div>
           </div>
-            <pre class="content__code">
-$ dkr stop --force
-$ dkr remove --force  
-          </pre>
+            <div class="terminal">
+              <div class="content-code">
+                <pre>
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/tulik/dkr/main/install.sh)"
+              </pre>
+            </div>
+          </div>
         </div>
-      <p class="content__text">After running the installation script, you can use <code>dkr</code> from anywhere on your system. Here's an example of how to use it:</p>
-      <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
-        <div class="console__buttons">
-          <div class="console__button console__button--red"></div>
-          <div class="console__button console__button--yellow"></div>
-          <div class="console__button console__button--green"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content-title">Usage</h2>
+        <p class="content-text"><code>dkr</code> is a simple command-line tool that makes managing Docker containers easy. The general syntax to use <code>dkr</code> is as follows: <code>dkr [action] [--force]</code>.</p> 
+        <p class="content-text"><code>stop</code> When you want to halt all the running Docker containers, this command comes in handy. It pauses all activity but doesn't remove the containers, allowing you to resume work later.</p>
+        <p class="content-text"><code>remove</code> If you need to free up resources and clean up, use this command. It will stop all running Docker containers first, then remove them completely.</p>
+        <p class="content-text">The <code>--force</code>  flag is an optional argument. It ensures the respective action (<code>stop</code> or <code>remove</code>) is carried out forcefully, regardless of the container's current state. It's used like this:</p>
+        <div class="window">
+          <div class="bar">
+            <div class="buttons">
+              <div class="button"></div>
+              <div class="button"></div>
+              <div class="button"></div>
+            </div>
+          </div>
+          <div class="terminal">
+            <div class="content-code">
+              <pre>
+  $ dkr stop --force
+  $ dkr remove --force
+              </pre>
+            </div>
+          </div>
         </div>
-          <pre class="content__code">
-Usage: dkr [action] [--force]
+      </div>
+    </section>
+    
+    <section>
+      <div class="container mx-auto">
+        <p class="content-text">After running the installation script, you can use <code>dkr</code> from anywhere on your system. Here's an example of how to use it:</p>
+        <div class="window">
+          <div class="bar">
+            <div class="buttons">
+              <div class="button"></div>
+              <div class="button"></div>
+              <div class="button"></div>
+            </div>
+          </div>
+          <div class="terminal">
+            <div class="content-code">
+              <pre>
+    Usage: dkr [action] [--force]
+    Actions:
+      stop     Stops all Docker containers
+      remove   Stops and removes all Docker containers
+      -f [--force]  Forces the stop or remove process
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-Actions:
-  stop     Stops all Docker containers
-  remove   Stops and removes all Docker containers
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content-title">Examples</h2>
+        <p class="content-text">The use of dkr becomes clearer with these examples.</p>
+        <p class="content-text">Suppose you want to stop all running Docker containers. You would use the <code>dkr stop</code> command. On execution, each stopped container's ID is displayed as a confirmation.</p>
+        <div class="window">
+          <div class="bar">
+            <div class="buttons">
+              <div class="button"></div>
+              <div class="button"></div>
+              <div class="button"></div>
+            </div>
+          </div>
+            <div class="terminal">
+              <div class="content-code">
+              <pre>
+  $ dkr stop
+  Stopping all Docker containers...
+  7dff5f3dae0a
+  9b79cafd596a
+  9d66ff06aaca
+  a81899a7a41
+            </pre>
+          </div>
+        </div>
+        <p class="content-text">If you want to stop and then remove all Docker containers, you use the <code>dkr remove</code> command. Similar to the stop command, each container's ID is displayed after it's removed.</p>
+        <div class="window">
+          <div class="bar">
+            <div class="buttons">
+              <div class="button"></div>
+              <div class="button"></div>
+              <div class="button"></div>
+            </div>
+          </div>
+            <div class="terminal">
+              <div class="content-code">
+            <pre>
+  $ dkr remove
+  Stopping and removing all Docker containers...
+  7dff5f3dae0a
+  9b79cafd596a
+  9d66ff06aaca
+  ca81899a7a41
+            </pre>              
+          </div>
+        </div>
+      </div>
+    </section>
 
-Options:
-  --force  Forces the stop or remove process            
-        </pre>
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content-title">License</h2>
+        <p class="content-text">This project is licensed under the MIT License.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content-title">Contributing</h2>
+        <p class="content-text">Contributions are welcome! Fork the repository and make your changes. Submit a pull request, and we'll review your changes together.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container mx-auto">
+        <h2 class="content-title">Acknowledgements</h2>
+        <p class="content-text">We would like to thank the Docker community for their support and contributions to the project.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="bg-neutral-200 text-center text-white dark:bg-neutral-600 content-text">
+    <div class="container pt-9">
+      <div class="mb-9 flex justify-center">
+        <a href="https://twitter.com/_tulik" class="mr-9 text-neutral-800 dark:text-neutral-200">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8"
+            fill="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+          </svg>
+        </a>
+        <a href="https://linkedin.com/in/tulik" class="mr-9 text-neutral-800 dark:text-neutral-200">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8"
+            fill="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
+          </svg>
+        </a>
+
+        <a href="http://github.com/tulik" class="mr-9 text-neutral-800 dark:text-neutral-200">
+          <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-8 w-8"
+          fill="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          </svg>        
+        </a>
+
+      <a href="https://stackoverflow.com/users/4107243/%c5%81ukasz-d-tulikowski" class="mr-9 text-neutral-800 dark:text-neutral-200">
+        <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-8 w-8"
+        fill="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          d="M15 21h-10v-2h10v2zm6-11.665l-1.621-9.335-1.993.346 1.62 9.335 1.994-.346zm-5.964 6.937l-9.746-.975-.186 2.016 9.755.879.177-1.92zm.538-2.587l-9.276-2.608-.526 1.954 9.306 2.5.496-1.846zm1.204-2.413l-8.297-4.864-1.029 1.743 8.298 4.865 1.028-1.744zm1.866-1.467l-5.339-7.829-1.672 1.14 5.339 7.829 1.672-1.14zm-2.644 4.195v8h-12v-8h-2v10h16v-10h-2z" />
+        </svg>
+      </a>
+    
       </div>
     </div>
-  </section>
-
-  <section>
-    <div class="container mx-auto">
-      <h2 class="content__title">Examples</h2>
-      <p class="content__text">The use of dkr becomes clearer with these examples.</p>
-      <p class="content__text">Suppose you want to stop all running Docker containers. You would use the <code>dkr stop</code> command. On execution, each stopped container's ID is displayed as a confirmation.</p>
-      <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
-        <div class="console__buttons">
-          <div class="console__button console__button--red"></div>
-          <div class="console__button console__button--yellow"></div>
-          <div class="console__button console__button--green"></div>
-        </div>
-        <pre class="content__code">
-$ dkr stop      
-
-Stopping and removing all Docker containers...
-7dff5f3dae0a
-9b79cafd596a
-9d66ff06aaca
-ca81899a7a41
-      </pre>
-      </div>
+  
+    <!--Copyright section-->
+    <div
+      class="bg-neutral-300 p-4 text-center text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200">
+      <a
+        class="text-neutral-800 dark:text-neutral-400"
+        href="https://softcloud.dev/"
+        >@ 2023 Łukasz D. Tulikowski</a
+      >    
     </div>
-  </section>
-  <section>
-    <div class="container mx-auto">
-      <p class="content__text">If you want to stop and then remove all Docker containers, you use the <code>dkr remove</code> command. Similar to the stop command, each container's ID is displayed after it's removed.</p>
-      <div class="console bg-gray-800 shadow-lg rounded-lg px-6 py-4 mt-6">
-        <div class="console__buttons">
-          <div class="console__button console__button--red"></div>
-          <div class="console__button console__button--yellow"></div>
-          <div class="console__button console__button--green"></div>
-        </div>
-        <pre class="content__code">
-$ dkr remove
-
-Stopping and removing all Docker containers...
-7dff5f3dae0a
-9b79cafd596a
-9d66ff06aaca
-ca81899a7a41
-      </pre>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="container mx-auto">
-      <h2 class="content__title">License</h2>
-      <p class="content__text">This project is licensed under the MIT License.</p>
-    </div>
-  </section>
-
-  <section>
-    <div class="container mx-auto">
-      <h2 class="content__title">
-
-Contributing</h2>
-      <p class="content__text">Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.</p>
-    </div>
-  </section>
-</main>
-<script>
-  function copyCodeToClipboard() {
-    const str = document.getElementById('code').innerText;
-    const el = document.createElement('textarea');
-    el.value = str;
-    el.setAttribute('readonly', '');
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-  }
-</script>
+  </footer>
 </body>
 </html>
